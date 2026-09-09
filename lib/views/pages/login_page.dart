@@ -1,6 +1,10 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:miracle/views/pages/home_page.dart';
+import 'package:miracle/views/pages/welcome_page.dart';
+
+import '../widget_tree.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -40,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
             image: DecorationImage(
               image: AssetImage('assets/images/icon.jpeg'),
               fit: BoxFit.fitWidth,
-              opacity: 0.5,
+              opacity: 0.7,
             ),
           ),
 
@@ -193,6 +197,14 @@ class _LoginPageState extends State<LoginPage> {
                                 child: ElevatedButton(
                                   onPressed: () {
                                     // UI only
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) {
+                                          return witree();
+                                        },
+                                      ),
+                                    );
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.white.withValues(
@@ -238,15 +250,22 @@ class _LoginPageState extends State<LoginPage> {
 
                                   GestureDetector(
                                     onTap: () {
-                                      // UI only
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) {
+                                            return WelcomePage();
+                                          },
+                                        ),
+                                      );
+                                      // UI
                                     },
                                     child: const Text(
                                       'Signup',
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        color: Colors.black,
                                         fontSize: 9,
                                         fontWeight: FontWeight.w600,
-                                        decoration: TextDecoration.underline,
                                       ),
                                     ),
                                   ),

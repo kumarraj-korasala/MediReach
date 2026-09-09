@@ -13,6 +13,10 @@ class Navbar extends StatelessWidget {
           destinations: [
             NavigationDestination(icon: Icon(Icons.home), label: "HOME"),
             NavigationDestination(icon: Icon(Icons.person), label: "PROFILE"),
+            NavigationDestination(
+              icon: Icon(Icons.video_call),
+              label: "VideoCall",
+            ),
           ],
           onDestinationSelected: (int value) {
             selectedPageNotifier.value = value;

@@ -3,9 +3,10 @@ import 'package:miracle/data/notifiers.dart';
 import 'package:miracle/views/pages/home_page.dart';
 import 'package:miracle/views/pages/profile_page.dart';
 import 'package:miracle/views/pages/settings_page.dart';
+import 'package:miracle/views/pages/videocall_page.dart';
 import 'package:miracle/views/widgets/navbar.dart';
 
-List<Widget> pages = [HomePage(), ProfilePage()];
+List<Widget> pages = [HomePage(), ProfilePage(), VideoCallPage()];
 
 class witree extends StatelessWidget {
   const witree({super.key});
@@ -14,7 +15,7 @@ class witree extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text("MY FIRST APP")),
+        title: Text("Medicare"),
         actions: [
           IconButton(
             onPressed: () {
