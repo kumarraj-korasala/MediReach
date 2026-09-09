@@ -1,0 +1,5 @@
+package com.Together.co.miracle
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity : FlutterActivity()
