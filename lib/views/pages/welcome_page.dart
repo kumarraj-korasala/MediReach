@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:miracle/views/pages/login_page.dart';
-
-import '../widget_tree.dart';
+import 'package:miracle/views/pages/signup_page.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
@@ -28,7 +27,7 @@ class WelcomePage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return witree();
+                      return SignupPage();
                     },
                   ),
                 );

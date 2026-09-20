@@ -1,5 +1,7 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
+
 import '../../features/calling/active_call_page.dart';
 import '../../features/calling/chat_page.dart';
 import '../../features/calling/signaling_service.dart';
@@ -23,7 +25,11 @@ class _VideoCallPageState extends State<VideoCallPage> {
   bool _isConnected = false;
   String? _activeIncomingCallId;
 
-  final List<String> _recentContacts = ['doctor_rahul', 'emergency_desk', 'lab_assistant'];
+  final List<String> _recentContacts = [
+    'doctor_rahul',
+    'emergency_desk',
+    'lab_assistant',
+  ];
 
   @override
   void initState() {
@@ -130,9 +136,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
 
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => ChatPage(contactId: targetId),
-      ),
+      MaterialPageRoute(builder: (context) => ChatPage(contactId: targetId)),
     );
   }
 
@@ -184,7 +188,10 @@ class _VideoCallPageState extends State<VideoCallPage> {
               Navigator.pop(context);
               _signaling.rejectCall(callId, receiverId: callerId);
             },
-            child: const Text('Decline', style: TextStyle(color: Colors.redAccent)),
+            child: const Text(
+              'Decline',
+              style: TextStyle(color: Colors.redAccent),
+            ),
           ),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
@@ -226,10 +233,12 @@ class _VideoCallPageState extends State<VideoCallPage> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: 120,
+            expandedHeight: 20,
             floating: true,
             pinned: true,
-            backgroundColor: isDark ? Colors.grey.shade900 : Colors.teal.shade700,
+            backgroundColor: isDark
+                ? Colors.grey.shade900
+                : Colors.teal.shade700,
             foregroundColor: Colors.white,
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
@@ -237,18 +246,27 @@ class _VideoCallPageState extends State<VideoCallPage> {
                 children: [
                   const Icon(Icons.forum, color: Colors.white, size: 20),
                   const SizedBox(width: 8),
-                  const Text('Miracle WhatsApp Connect', style: TextStyle(fontSize: 16)),
+                  const Text(
+                    'MEDI Connect',
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                  ),
                   const Spacer(),
                   Container(
-                    margin: const EdgeInsets.only(right: 20),
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: _isConnected ? Colors.green : Colors.orange,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(15),
                     ),
                     child: Text(
                       _isConnected ? 'ONLINE' : 'OFFLINE',
-                      style: const TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
@@ -264,7 +282,9 @@ class _VideoCallPageState extends State<VideoCallPage> {
                   // SERVER CONNECTION CARD
                   Card(
                     elevation: 3,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
@@ -274,17 +294,28 @@ class _VideoCallPageState extends State<VideoCallPage> {
                             children: [
                               CircleAvatar(
                                 radius: 18,
-                                backgroundColor: _isConnected ? Colors.green.shade100 : Colors.orange.shade100,
+                                backgroundColor: _isConnected
+                                    ? Colors.green.shade100
+                                    : Colors.orange.shade100,
                                 child: Icon(
-                                  _isConnected ? Icons.cloud_done : Icons.cloud_off,
-                                  color: _isConnected ? Colors.green.shade800 : Colors.orange.shade800,
+                                  _isConnected
+                                      ? Icons.cloud_done
+                                      : Icons.cloud_off,
+                                  color: _isConnected
+                                      ? Colors.green.shade800
+                                      : Colors.orange.shade800,
                                   size: 20,
                                 ),
                               ),
                               const SizedBox(width: 12),
                               Text(
-                                _isConnected ? 'Connected to Signaling Server' : 'Signaling Connection Setup',
-                                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                                _isConnected
+                                    ? 'Connected to Signaling Server'
+                                    : 'Signaling Connection Setup',
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ],
                           ),
@@ -321,14 +352,28 @@ class _VideoCallPageState extends State<VideoCallPage> {
                             width: double.infinity,
                             child: ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: _isConnected ? Colors.grey : Colors.teal.shade700,
+                                backgroundColor: _isConnected
+                                    ? Colors.grey
+                                    : Colors.teal.shade700,
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 12),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
                               ),
-                              icon: Icon(_isConnected ? Icons.check : Icons.login),
-                              label: Text(_isConnected ? 'Connected' : 'Connect to Network'),
-                              onPressed: _isConnected ? null : _connectToSignaling,
+                              icon: Icon(
+                                _isConnected ? Icons.check : Icons.login,
+                              ),
+                              label: Text(
+                                _isConnected
+                                    ? 'Connected'
+                                    : 'Connect to Network',
+                              ),
+                              onPressed: _isConnected
+                                  ? null
+                                  : _connectToSignaling,
                             ),
                           ),
                         ],
@@ -341,7 +386,9 @@ class _VideoCallPageState extends State<VideoCallPage> {
                   // START NEW DIRECT CONVERSATION CARD
                   Card(
                     elevation: 3,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
@@ -349,7 +396,10 @@ class _VideoCallPageState extends State<VideoCallPage> {
                         children: [
                           const Text(
                             'Start Conversation or Call',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const SizedBox(height: 10),
                           TextField(
@@ -357,7 +407,9 @@ class _VideoCallPageState extends State<VideoCallPage> {
                             decoration: InputDecoration(
                               labelText: 'Target Contact ID (e.g. user_102)',
                               prefixIcon: const Icon(Icons.person_search),
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -368,19 +420,27 @@ class _VideoCallPageState extends State<VideoCallPage> {
                                 icon: Icons.chat,
                                 label: 'Chat & Share',
                                 color: Colors.blue.shade600,
-                                onTap: () => _openChatWith(_targetIdController.text.trim()),
+                                onTap: () => _openChatWith(
+                                  _targetIdController.text.trim(),
+                                ),
                               ),
                               _actionIconButton(
                                 icon: Icons.call,
                                 label: 'Voice Call',
                                 color: Colors.teal.shade600,
-                                onTap: () => _startCallWith(_targetIdController.text.trim(), false),
+                                onTap: () => _startCallWith(
+                                  _targetIdController.text.trim(),
+                                  false,
+                                ),
                               ),
                               _actionIconButton(
                                 icon: Icons.videocam,
                                 label: 'Video Call',
                                 color: Colors.purple.shade600,
-                                onTap: () => _startCallWith(_targetIdController.text.trim(), true),
+                                onTap: () => _startCallWith(
+                                  _targetIdController.text.trim(),
+                                  true,
+                                ),
                               ),
                             ],
                           ),
@@ -398,71 +458,52 @@ class _VideoCallPageState extends State<VideoCallPage> {
                   ),
                   const SizedBox(height: 10),
 
-                  ..._recentContacts.map((contact) => Card(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.teal.shade100,
-                            child: Text(
-                              contact[0].toUpperCase(),
-                              style: TextStyle(color: Colors.teal.shade900, fontWeight: FontWeight.bold),
+                  ..._recentContacts.map(
+                    (contact) => Card(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.teal.shade100,
+                          child: Text(
+                            contact[0].toUpperCase(),
+                            style: TextStyle(
+                              color: Colors.teal.shade900,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          title: Text(contact, style: const TextStyle(fontWeight: FontWeight.w600)),
-                          subtitle: const Text('Tap to start call or chat'),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.chat, color: Colors.blue),
-                                onPressed: () => _openChatWith(contact),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.call, color: Colors.teal),
-                                onPressed: () => _startCallWith(contact, false),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.videocam, color: Colors.purple),
-                                onPressed: () => _startCallWith(contact, true),
-                              ),
-                            ],
-                          ),
                         ),
-                      )),
-
-                  const SizedBox(height: 16),
-
-                  // NETWORK CAPABILITY CHIP BANNER
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: isDark ? Colors.grey.shade900 : Colors.teal.shade50,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.teal.withValues(alpha: 0.3)),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.signal_cellular_alt, color: Colors.teal, size: 28),
-                        const SizedBox(width: 12),
-                        const Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '3G, 4G, 5G Adaptive Engine Active',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                              ),
-                              Text(
-                                'Supports dynamic resolution scaling, packet-loss resilience & WebRTC ICE handover.',
-                                style: TextStyle(fontSize: 11, color: Colors.grey),
-                              ),
-                            ],
-                          ),
+                        title: Text(
+                          contact,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
                         ),
-                      ],
+                        subtitle: const Text('Tap to start call or chat'),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.chat, color: Colors.blue),
+                              onPressed: () => _openChatWith(contact),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.call, color: Colors.teal),
+                              onPressed: () => _startCallWith(contact, false),
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.videocam,
+                                color: Colors.purple,
+                              ),
+                              onPressed: () => _startCallWith(contact, true),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
@@ -491,7 +532,10 @@ class _VideoCallPageState extends State<VideoCallPage> {
               child: Icon(icon, color: Colors.white, size: 24),
             ),
             const SizedBox(height: 6),
-            Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+            ),
           ],
         ),
       ),
