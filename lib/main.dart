@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:miracle/core/session/session_manager.dart';
 import 'package:miracle/data/notifiers.dart';
 import 'package:miracle/views/pages/welcome_page.dart';
+import 'package:miracle/views/widget_tree.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -27,9 +30,23 @@ class _MyAppState extends State<MyApp> {
               brightness: darkMode ? Brightness.dark : Brightness.light,
             ),
           ),
-          home: WelcomePage(),
+          home: FutureBuilder<bool>(
+            future: SessionManager.instance.isLoggedIn(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Scaffold(
+                  body: Center(child: CircularProgressIndicator(color: Colors.teal)),
+                );
+              }
+              if (snapshot.data == true) {
+                return const witree();
+              }
+              return const WelcomePage();
+            },
+          ),
         );
       },
     );
   }
 }
+

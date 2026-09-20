@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:miracle/views/pages/welcome_page.dart';
 import 'package:miracle/views/pages/signup_page.dart';
 
 import '../widget_tree.dart';
