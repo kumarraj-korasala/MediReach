@@ -14,6 +14,10 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>NSCameraUsageDescription</key>
+    <string>This app needs camera access for video calls.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>This app needs microphone access for voice and video calls.</string>
 	<key>CFBundleName</key>
 	<string>miracle</string>
 	<key>CFBundlePackageType</key>

@@ -6,7 +6,7 @@ import 'package:miracle/views/pages/settings_page.dart';
 import 'package:miracle/views/pages/videocall_page.dart';
 import 'package:miracle/views/widgets/navbar.dart';
 
-List<Widget> pages = [HomePage(), ProfilePage(), VideoCallPage()];
+List<Widget> pages = [HomePage(), VideoCallPage(), ProfilePage()];
 
 class witree extends StatelessWidget {
   const witree({super.key});
