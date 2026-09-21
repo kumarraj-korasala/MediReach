@@ -1,6 +1,10 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:miracle/core/remote/api_client.dart';
+import 'package:miracle/core/remote/abha_service.dart';
+import 'package:miracle/core/session/session_manager.dart';
+import 'package:miracle/data/models/models.dart';
 import 'package:miracle/views/pages/signup_page.dart';
 
 import '../widget_tree.dart';
@@ -15,11 +19,107 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool isAdmin = true;
   bool obscurePassword = true;
+  bool _isLoading = false;
 
   String selectedRole = 'ANM';
 
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  void _showServerSettingsDialog() {
+    final ipController = TextEditingController(text: ApiClient.instance.serverHost);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(
+          children: [
+            Icon(Icons.cloud_sync, color: Colors.teal),
+            SizedBox(width: 8),
+            Text('Server Config', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Select a preset or enter a custom backend address:',
+                style: TextStyle(fontSize: 13, color: Colors.black54),
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 6,
+                children: [
+                  ActionChip(
+                    avatar: const Icon(Icons.cloud_done, size: 16, color: Colors.teal),
+                    label: const Text('Cloudflare Tunnel', style: TextStyle(fontSize: 12)),
+                    onPressed: () {
+                      ipController.text = ApiClient.defaultHost;
+                    },
+                  ),
+                  ActionChip(
+                    avatar: const Icon(Icons.sync, size: 16, color: Colors.amber),
+                    label: const Text('Auto-Detect from Cloud', style: TextStyle(fontSize: 12)),
+                    onPressed: () async {
+                      final live = await ApiClient.instance.autoDiscoverBackendUrl();
+                      if (live != null) {
+                        ipController.text = live;
+                      }
+                    },
+                  ),
+                  ActionChip(
+                    avatar: const Icon(Icons.wifi, size: 16, color: Colors.indigo),
+                    label: const Text('Local Wi-Fi (10.4.10.57)', style: TextStyle(fontSize: 12)),
+                    onPressed: () {
+                      ipController.text = ApiClient.localWifiHost;
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: ipController,
+                maxLines: 2,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Server URL / IP',
+                  hintText: 'https://xxx.trycloudflare.com or 10.4.10.57',
+                  prefixIcon: Icon(Icons.link),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (ipController.text.trim().isNotEmpty) {
+                await ApiClient.instance.updateServerHost(ipController.text.trim());
+                if (ctx.mounted) {
+                  Navigator.of(ctx).pop();
+                  ScaffoldMessenger.of(ctx).showSnackBar(
+                    SnackBar(
+                      content: Text('Connected to: ${ApiClient.instance.baseUrl}'),
+                      backgroundColor: Colors.teal,
+                    ),
+                  );
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
+            child: const Text('Save & Apply', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   void dispose() {
@@ -54,7 +154,15 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 100),
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: IconButton(
+                        icon: const Icon(Icons.settings_ethernet, color: Colors.teal, size: 28),
+                        tooltip: 'Configure Backend Server IP',
+                        onPressed: _showServerSettingsDialog,
+                      ),
+                    ),
+                    const SizedBox(height: 50),
 
                     // =================================================
                     // LOGIN TITLE
@@ -148,12 +256,12 @@ class _LoginPageState extends State<LoginPage> {
                               ],
 
                               // =================================================
-                              // USERNAME
+                              // USERNAME / ABHA / MOBILE
                               // =================================================
                               _buildTextField(
                                 controller: usernameController,
-                                hintText: 'username/email ID',
-                                icon: Icons.email,
+                                hintText: 'ABHA ID / Mobile / Username',
+                                icon: Icons.badge_outlined,
                               ),
 
                               const SizedBox(height: 20),
@@ -190,45 +298,134 @@ class _LoginPageState extends State<LoginPage> {
                               // =================================================
                               // LOGIN BUTTON
                               // =================================================
-                              SizedBox(
-                                width: 115,
-                                height: 41,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    // UI only
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) {
-                                          return witree();
-                                        },
+                                SizedBox(
+                                  width: 130,
+                                  height: 41,
+                                  child: ElevatedButton(
+                                    onPressed: _isLoading
+                                        ? null
+                                        : () async {
+                                            final username = usernameController.text.trim();
+                                            final password = passwordController.text.trim();
+
+                                            if (username.isEmpty) {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text('Please enter your username or phone number.'),
+                                                ),
+                                              );
+                                              return;
+                                            }
+
+                                            setState(() => _isLoading = true);
+
+                                            final roleStr = isAdmin ? selectedRole : 'Citizen Patient';
+                                            final response = await ApiClient.instance.post('/auth/login', {
+                                              'username': username,
+                                              'password': password,
+                                              'role': roleStr,
+                                            });
+
+                                            if (!mounted) return;
+                                            setState(() => _isLoading = false);
+
+                                            if (response['success'] != true || response['user'] == null) {
+                                              final errMsg = response['message'] ??
+                                                  'Invalid credentials. Please check your username & password or create an account via SignUp.';
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                  content: Text('❌ $errMsg'),
+                                                  backgroundColor: Colors.red.shade700,
+                                                  duration: const Duration(seconds: 3),
+                                                ),
+                                              );
+                                              return;
+                                            }
+
+                                            final u = response['user'];
+                                            final id = u['id'] ?? 'usr-${DateTime.now().millisecondsSinceEpoch}';
+                                            final name = u['name'] ?? username;
+                                            final abhaId = u['abha_id'];
+                                            UserRole userRole = UserRole.patient;
+
+                                            final r = (u['role'] as String? ?? '').toLowerCase();
+                                            if (r.contains('admin') || r.contains('superintendent')) {
+                                              userRole = UserRole.admin;
+                                            } else if (r.contains('doc')) {
+                                              userRole = UserRole.doctor;
+                                            } else if (r.contains('anm') ||
+                                                r.contains('asha') ||
+                                                r.contains('worker') ||
+                                                r.contains('nurse')) {
+                                              userRole = UserRole.healthWorker;
+                                            } else {
+                                              userRole = UserRole.patient;
+                                            }
+
+                                            final appUser = AppUser(
+                                              id: id,
+                                              name: name,
+                                              role: userRole,
+                                              phone: u['phone'] ?? username,
+                                              abhaId: abhaId,
+                                            );
+
+                                            await SessionManager.instance.saveSession(appUser);
+
+                                            // Automatically link and sync existing clinical records from ABDM
+                                            if (abhaId != null && (abhaId as String).trim().isNotEmpty) {
+                                              AbhaService.instance.fetchAndSyncAbhaRecords(abhaId.trim());
+                                            }
+
+                                            if (mounted) {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                  content: Text('✅ Welcome back, ${appUser.name}! (${appUser.role.name.toUpperCase()})'),
+                                                  backgroundColor: const Color(0xFF26A69A),
+                                                ),
+                                              );
+
+                                              Navigator.pushReplacement(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => const witree(),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.white.withValues(
+                                        alpha: 0.65,
                                       ),
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.white.withValues(
-                                      alpha: 0.65,
-                                    ),
-                                    foregroundColor: Colors.black,
-                                    elevation: 0,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(25),
-                                      side: BorderSide(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.7,
+                                      foregroundColor: Colors.black,
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(25),
+                                        side: BorderSide(
+                                          color: Colors.white.withValues(
+                                            alpha: 0.7,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  child: const Text(
-                                    'Login',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                    child: _isLoading
+                                        ? const SizedBox(
+                                            height: 18,
+                                            width: 18,
+                                            child: CircularProgressIndicator(
+                                              color: Colors.black,
+                                              strokeWidth: 2,
+                                            ),
+                                          )
+                                        : const Text(
+                                            'Login',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
                                   ),
                                 ),
-                              ),
 
                               const SizedBox(height: 23),
 
@@ -327,9 +524,9 @@ class _LoginPageState extends State<LoginPage> {
               ),
 
               items: const [
-                DropdownMenuItem(value: 'ANM', child: Text('ANM')),
-                DropdownMenuItem(value: 'Doctor', child: Text('Doctor')),
-                DropdownMenuItem(value: 'Nurse', child: Text('Nurse')),
+                DropdownMenuItem(value: 'ANM', child: Text('🩺 ASHA / ANM Worker')),
+                DropdownMenuItem(value: 'Doctor', child: Text('👨‍⚕️ Medical Officer / Doctor')),
+                DropdownMenuItem(value: 'Admin', child: Text('🏛️ Hospital Administrator')),
               ],
 
               onChanged: (value) {

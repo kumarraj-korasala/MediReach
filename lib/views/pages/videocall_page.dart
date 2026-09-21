@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:miracle/core/remote/api_client.dart';
 
 import '../../features/calling/active_call_page.dart';
 import '../../features/calling/chat_page.dart';
@@ -18,8 +19,8 @@ class _VideoCallPageState extends State<VideoCallPage> {
 
   final TextEditingController _myIdController = TextEditingController();
   final TextEditingController _targetIdController = TextEditingController();
-  final TextEditingController _serverIpController = TextEditingController(
-    text: '10.55.11.194:8000',
+  late final TextEditingController _serverIpController = TextEditingController(
+    text: '${ApiClient.instance.serverHost}:8000',
   );
 
   bool _isConnected = false;

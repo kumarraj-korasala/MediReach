@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:miracle/core/remote/api_client.dart';
 import 'package:miracle/core/session/session_manager.dart';
 import 'package:miracle/data/notifiers.dart';
 import 'package:miracle/views/pages/welcome_page.dart';
 import 'package:miracle/views/widget_tree.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await ApiClient.instance.init();
   runApp(const MyApp());
 }
 

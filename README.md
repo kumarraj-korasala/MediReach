@@ -12,3 +12,19 @@ A production-grade, offline-first digital healthcare continuity and tele-triage 
 * 💊 **Pharmacy Inventory & Diagnostics**: Real-time essential drug stock search and clinical laboratory report registry.
 
 For the complete architectural design, database schemas, RBAC matrix, and API references, see [MASTER_ARCHITECTURE.md](MASTER_ARCHITECTURE.md).
+
+
+cd c:\Users\kumar\StudioProjects\miracle\backend\node_api
+npm start
+
+
+cd c:\Users\kumar\StudioProjects\miracle\backend
+venv\Scripts\uvicorn.exe server:app --host 0.0.0.0 --port 8000
+
+
+cd c:\Users\kumar\StudioProjects\miracle\backend\ml_service
+..\venv\Scripts\uvicorn.exe ml_server:app --host 0.0.0.0 --port 8001
+
+
+cd c:\Users\kumar\StudioProjects\miracle
+.\cloudflared.exe tunnel --url http://localhost:5000
