@@ -29,18 +29,25 @@ class SignalingService {
     while (cleanDomain.endsWith('/')) {
       cleanDomain = cleanDomain.substring(0, cleanDomain.length - 1);
     }
+    // Strip /api suffix if passed accidentally
+    if (cleanDomain.endsWith('/api')) {
+      cleanDomain = cleanDomain.substring(0, cleanDomain.length - 4);
+    }
 
     String scheme;
     if (cleanDomain.startsWith('wss://')) {
       scheme = '';
     } else if (cleanDomain.startsWith('ws://')) {
       scheme = '';
-    } else if (cleanDomain.contains('ngrok') ||
+    } else if (cleanDomain.contains('trycloudflare.com') ||
+        cleanDomain.contains('ngrok') ||
         cleanDomain.contains('onrender.com') ||
         cleanDomain.contains('railway') ||
         cleanDomain.contains('loca.lt') ||
         cleanDomain.contains('fly.dev')) {
       scheme = 'wss://';
+      // Strip any custom port from public tunnels since they route via 443
+      cleanDomain = cleanDomain.replaceAll(RegExp(r':\d+$'), '');
     } else {
       scheme = 'ws://';
     }

@@ -20,7 +20,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
   final TextEditingController _myIdController = TextEditingController();
   final TextEditingController _targetIdController = TextEditingController();
   late final TextEditingController _serverIpController = TextEditingController(
-    text: '${ApiClient.instance.serverHost}:8000',
+    text: _getDefaultSignalingHost(),
   );
 
   bool _isConnected = false;
@@ -32,9 +32,20 @@ class _VideoCallPageState extends State<VideoCallPage> {
     'lab_assistant',
   ];
 
+  static String _getDefaultSignalingHost() {
+    final host = ApiClient.instance.serverHost.trim();
+    if (host.contains('trycloudflare.com') ||
+        host.startsWith('https://') ||
+        host.startsWith('http://')) {
+      return host;
+    }
+    return '$host:5000';
+  }
+
   @override
   void initState() {
     super.initState();
+    _serverIpController.text = _getDefaultSignalingHost();
     _myIdController.text = 'user_${Random().nextInt(8999) + 1000}';
 
     _signaling.messages.listen((msg) {
@@ -327,10 +338,31 @@ class _VideoCallPageState extends State<VideoCallPage> {
                                 child: TextField(
                                   controller: _serverIpController,
                                   enabled: !_isConnected,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Server IP:Port',
+                                  decoration: InputDecoration(
+                                    labelText: 'Server IP:Port / Tunnel',
                                     isDense: true,
-                                    border: OutlineInputBorder(),
+                                    border: const OutlineInputBorder(),
+                                    suffixIcon: IconButton(
+                                      icon: const Icon(Icons.cloud_sync, size: 20),
+                                      tooltip: 'Auto-Detect Cloud Tunnel from Supabase',
+                                      onPressed: _isConnected
+                                          ? null
+                                          : () async {
+                                              final sm = ScaffoldMessenger.of(context);
+                                              final live = await ApiClient.instance.autoDiscoverBackendUrl();
+                                              if (live != null && mounted) {
+                                                setState(() {
+                                                  _serverIpController.text = live;
+                                                });
+                                                sm.showSnackBar(
+                                                  SnackBar(
+                                                    content: Text('Auto-detected Cloud Tunnel: $live'),
+                                                    backgroundColor: Colors.teal.shade700,
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                    ),
                                   ),
                                 ),
                               ),
